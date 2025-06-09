@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TNP Live</title>
+  <title>TNPL Live</title>
   <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet" />
   <style>
     body {
@@ -63,12 +63,12 @@
       50% { opacity: 0.2; }
     }
 
-    .video-container {
+    .iframe-player {
       width: 100%;
       height: 280px;
+      border: none;
       border-radius: 10px;
       background: #000;
-      overflow: hidden;
     }
 
     .popup {
@@ -109,45 +109,6 @@
     .btn-ok { background: #00ff88; color: #000; }
     .btn-cancel { background: #ff5555; color: white; }
 
-    /* CORS Controls */
-    .cors-controls {
-      background: rgba(0,0,0,0.3);
-      padding: 10px;
-      border-radius: 8px;
-      margin: 10px 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .cors-controls select, .cors-controls button {
-      padding: 5px 10px;
-      border-radius: 4px;
-      border: 1px solid #444;
-      background: #333;
-      color: white;
-    }
-
-    .cors-controls button {
-      cursor: pointer;
-    }
-
-    .cors-controls button.off {
-      background: #555;
-    }
-
-    .status-message {
-      font-size: 12px;
-      text-align: center;
-      margin-top: 5px;
-      min-height: 18px;
-    }
-
-    .status-error {
-      color: #ff5555;
-    }
-
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -176,171 +137,36 @@
   <!-- Header -->
   <div class="header">TNPL LIVE</div>
 
-  <!-- CORS Controls -->
-  <div class="cors-controls">
-    <select id="corsOption">
-      <option value="direct">Direct Connection</option>
-      <option value="cors1">CORS Proxy 1</option>
-      <option value="cors2">CORS Proxy 2</option>
-      <option value="cors3">CORS Proxy 3</option>
-      <option value="cors4">CORS Proxy 4</option>
-    </select>
-    <button id="corsToggle" onclick="toggleAutoCors()">Auto CORS: ON</button>
-    <div class="status-message" id="statusMessage"></div>
-  </div>
-
   <!-- Stream Cards -->
   <div class="cards">
-    <!-- World Wide -->
+    <!-- English Stream -->
     <div class="card">
       <div class="stream-title">
-        <span>TNPL LIVE</span>
+        <span>TNPL WORLD WIDE</span>
         <span class="live-badge">LIVE</span>
       </div>
-      <div class="video-container">
-        <video id="worldwide-stream" class="video-js vjs-default-skin" controls>
-          <source src="" type="application/x-mpegURL">
-        </video>
-      </div>
+      <iframe class="iframe-player" src="https://anym3u8player.com/ultimate-player-generator/player.php?player=jwplayer&url=https://dai.fancode.com/primary/126533_english_hls_95862adfreeta-di_h264/index.m3u8" allowfullscreen></iframe>
     </div>
 
     <!-- Tamil Stream -->
     <div class="card">
       <div class="stream-title">
-        <span>TNPL Tamil Stream</span>
+        <span>TNPL INDIA ONLY</span>
         <span class="live-badge">LIVE</span>
       </div>
-      <div class="video-container">
-        <video id="india-stream" class="video-js vjs-default-skin" controls>
-          <source src="" type="application/x-mpegURL">
-        </video>
-      </div>
+      <iframe class="iframe-player" src="https://anym3u8player.com/ultimate-player-generator/player.php?player=jwplayer&url=https://dai.fancode.com/primary/126533_english_hls_95862adfreeta-di_h264/index.m3u8" allowfullscreen></iframe>
     </div>
   </div>
 
-  <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.15.0/videojs-contrib-hls.min.js"></script>
   <script>
-    // CORS Proxy System
-    const corsProxies = {
-        direct: url => url,
-        cors1: url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-        cors2: url => `https://api.cors.lol/?url=${url}`,
-        cors3: url => `https://proxy-js.onrender.com/${url}`,
-        cors4: url => `https://universal-cors-proxy.glitch.me/${encodeURIComponent(url)}`
-    };
-
-    const proxyKeys = Object.keys(corsProxies);
-    let currentProxyIndex = 0;
-    let autoCors = true;
-
-    // Stream URLs
-    const streamUrls = {
-        worldwide: "https://dai.fancode.com/primary/126530_english_hls_35957adfreeta-di_h264/index.m3u8",
-        india: "https://dai.fancode.com/primary/126530_tamil_hls_81572adfreeta-di_h264/index.m3u8"
-    };
-
-    // VideoJS Players
-    const worldwidePlayer = videojs('worldwide-stream');
-    const indiaPlayer = videojs('india-stream');
-
-    // Apply selected proxy
-    function applyCorsToUrl(url) {
-        const selectedProxy = document.getElementById('corsOption').value || 'direct';
-        const proxiedUrl = corsProxies[selectedProxy](url);
-        console.log(`Applying ${selectedProxy} proxy to: ${proxiedUrl}`);
-        return proxiedUrl;
-    }
-
-    // Toggle Auto CORS
-    function toggleAutoCors() {
-        autoCors = !autoCors;
-        const toggleBtn = document.getElementById('corsToggle');
-        toggleBtn.textContent = `Auto CORS: ${autoCors ? 'ON' : 'OFF'}`;
-        toggleBtn.classList.toggle('off', !autoCors);
-        showStatus(`Auto CORS ${autoCors ? 'enabled' : 'disabled'}`);
-    }
-
-    // Show status message
-    function showStatus(message, isError = false) {
-        const statusElement = document.getElementById('statusMessage');
-        statusElement.textContent = message;
-        statusElement.className = isError ? 'status-message status-error' : 'status-message';
-    }
-
-    // Test a specific proxy
-    async function testProxy(proxyKey, url) {
-        try {
-            const proxiedUrl = corsProxies[proxyKey](url);
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const res = await fetch(proxiedUrl, {
-                method: 'HEAD',
-                cache: 'no-store',
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-            if (!res.ok || res.status === 429) return false;
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
-    // Auto-find a working proxy
-    async function findWorkingProxy(url, startIndex = 0) {
-        for (let i = 0; i < proxyKeys.length; i++) {
-            const index = (startIndex + i) % proxyKeys.length;
-            const proxyKey = proxyKeys[index];
-            showStatus(`Testing ${proxyKey} for connectivity...`);
-            if (await testProxy(proxyKey, url)) {
-                currentProxyIndex = index;
-                document.getElementById('corsOption').value = proxyKey;
-                showStatus(`Using ${proxyKey} for connection.`);
-                return true;
-            }
-            await new Promise(r => setTimeout(r, 300));
-        }
-        showStatus('No working proxy found. Try different URL.', true);
-        return false;
-    }
-
-    // Load stream with CORS handling
-    async function loadStream(player, url) {
-        try {
-            if (autoCors) {
-                await findWorkingProxy(url);
-            }
-            
-            const proxiedUrl = applyCorsToUrl(url);
-            player.src({ src: proxiedUrl, type: 'application/x-mpegURL' });
-            player.ready(function() {
-                player.play();
-            });
-        } catch (error) {
-            console.error('Error loading stream:', error);
-            showStatus('Error loading stream. Trying next proxy...', true);
-            currentProxyIndex = (currentProxyIndex + 1) % proxyKeys.length;
-            setTimeout(() => loadStream(player, url), 1000);
-        }
-    }
-
-    // Original functions
     function joinChannel() {
       window.location.href = 'https://t.me/IPTVM3Y';
     }
-    
     function closePopup() {
       document.getElementById('welcomePopup').style.display = 'none';
     }
-
-    // Initialize
     window.onload = () => {
       document.getElementById('welcomePopup').style.display = 'flex';
-      
-      // Load streams
-      loadStream(worldwidePlayer, streamUrls.worldwide);
-      loadStream(indiaPlayer, streamUrls.india);
     };
   </script>
 </body>
