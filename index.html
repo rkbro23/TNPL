@@ -3,171 +3,476 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TNPL Live</title>
+  <title>TNPL Live Streaming</title>
   <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1e1e2f, #2a2a3e);
-      color: #fff;
+    :root {
+      --primary: #00ff88;
+      --secondary: #2a2a3e;
+      --dark: #151522;
+      --darker: #0f0f18;
+      --card-bg: #191932;
+      --text: #ffffff;
+      --danger: #ff5555;
+      --warning: #ffaa00;
     }
 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--darker), var(--dark));
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header */
     .header {
       text-align: center;
-      padding: 15px;
-      font-size: 24px;
-      font-weight: bold;
-      background-color: #151522;
-      color: #00ff88;
-      animation: fadeIn 1s ease-in;
+      padding: 20px;
+      font-size: 2rem;
+      font-weight: 700;
+      background: rgba(21, 21, 34, 0.9);
+      color: var(--primary);
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+      animation: fadeInDown 0.8s ease-out;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.2);
     }
 
+    .header::after {
+      content: '';
+      display: block;
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), #00b3ff);
+      margin: 12px auto 0;
+      border-radius: 3px;
+      animation: expand 1s ease-out;
+    }
+
+    /* Cards Container */
     .cards {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
-      padding: 20px;
+      gap: 30px;
+      padding: 30px 20px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
+    /* Stream Card */
     .card {
-      background-color: #191932;
-      border-radius: 12px;
-      padding: 15px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.4);
-      animation: fadeIn 1s ease-in;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: fadeInUp 0.8s ease-out;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0, 255, 136, 0.1);
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+      border-color: rgba(0, 255, 136, 0.3);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), #00b3ff);
     }
 
     .stream-title {
-      font-size: 20px;
-      margin-bottom: 10px;
+      font-size: 1.4rem;
+      margin-bottom: 15px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .stream-title i {
+      color: var(--primary);
+      font-size: 1.2rem;
     }
 
     .live-badge {
-      background-color: red;
+      background-color: var(--danger);
       color: white;
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 6px;
-      animation: blink 1s infinite;
+      font-size: 0.8rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      animation: pulse 1.5s infinite;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
+    .live-badge i {
+      font-size: 0.6rem;
     }
 
+    /* Video Player */
     .iframe-player {
       width: 100%;
-      height: 280px;
+      height: 300px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       background: #000;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
     }
 
+    .iframe-player:hover {
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Popup */
     .popup {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 9999;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.5s ease-out;
     }
 
     .popup-content {
-      background: #2a2a3e;
-      padding: 20px;
-      border-radius: 10px;
+      background: linear-gradient(145deg, var(--dark), var(--secondary));
+      padding: 30px;
+      border-radius: 16px;
       text-align: center;
-      max-width: 400px;
-      animation: slideIn 0.6s ease-out;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .popup-content::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        transparent 45%,
+        rgba(0, 255, 136, 0.1) 50%,
+        transparent 55%
+      );
+      animation: shine 3s infinite;
     }
 
     .popup-content h2 {
-      color: #00ff88;
-      margin-bottom: 10px;
+      color: var(--primary);
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+      text-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
     }
 
-    .popup-buttons button {
-      margin: 10px;
-      padding: 10px 20px;
+    .popup-content p {
+      margin-bottom: 25px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .popup-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .btn {
+      padding: 12px 30px;
       border: none;
-      border-radius: 5px;
-      font-size: 16px;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: 0.3s;
+      transition: all 0.3s;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
-    .btn-ok { background: #00ff88; color: #000; }
-    .btn-cancel { background: #ff5555; color: white; }
+    .btn-ok {
+      background: var(--primary);
+      color: #000;
+      box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+    }
 
+    .btn-ok:hover {
+      background: #00e67a;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 255, 136, 0.5);
+    }
+
+    .btn-cancel {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 20px;
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+      color: #00e67a;
+    }
+
+    /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
 
-    @keyframes slideIn {
-      from { transform: translateY(-50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+      }
+    }
+
+    @keyframes shine {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes expand {
+      from { width: 0; opacity: 0; }
+      to { width: 100px; opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        font-size: 1.5rem;
+        padding: 15px;
+      }
+
+      .stream-title {
+        font-size: 1.2rem;
+      }
+
+      .cards {
+        padding: 20px 15px;
+        gap: 20px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .iframe-player {
+        height: 250px;
+      }
+
+      .popup-content {
+        padding: 25px 20px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        min-width: 100px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- POPUP -->
+  <!-- Welcome Popup -->
   <div class="popup" id="welcomePopup">
     <div class="popup-content">
-      <h2>TNPL LIVE STREAMING</h2>
-      <p>Join our Telegram for more matches links</p>
+      <h2><i class="fas fa-tv"></i> TNPL LIVE STREAMING</h2>
+      <p>Enjoy high-quality live streaming of Tamil Nadu Premier League matches. Join our Telegram channel for updates and more streaming links.</p>
       <div class="popup-buttons">
-        <button class="btn-ok" onclick="joinChannel()">OK</button>
-        <button class="btn-cancel" onclick="closePopup()">Cancel</button>
+        <button class="btn btn-ok" onclick="joinChannel()">
+          <i class="fab fa-telegram"></i> Join Now
+        </button>
+        <button class="btn btn-cancel" onclick="closePopup()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Header -->
-  <div class="header">TNPL LIVE</div>
+  <div class="header">
+    <i class="fas fa-cricket"></i> TNPL LIVE STREAMING
+  </div>
 
   <!-- Stream Cards -->
   <div class="cards">
-    <!-- English Stream -->
+    <!-- World Wide Stream -->
     <div class="card">
       <div class="stream-title">
+        <i class="fas fa-globe-americas"></i>
         <span>TNPL WORLD WIDE</span>
-        <span class="live-badge">LIVE</span>
+        <span class="live-badge">
+          <i class="fas fa-circle"></i> LIVE
+        </span>
       </div>
       <iframe class="iframe-player" src="https://anym3u8player.com/ultimate-player-generator/player.php?player=jwplayer&url=https://dai.fancode.com/primary/126533_english_hls_95862adfreeta-di_h264/index.m3u8" allowfullscreen></iframe>
     </div>
 
-    <!-- Tamil Stream -->
+    <!-- India Only Stream -->
     <div class="card">
       <div class="stream-title">
+        <i class="fas fa-map-marker-alt"></i>
         <span>TNPL INDIA ONLY</span>
-        <span class="live-badge">LIVE</span>
+        <span class="live-badge">
+          <i class="fas fa-circle"></i> LIVE
+        </span>
       </div>
       <iframe class="iframe-player" src="https://anym3u8player.com/ultimate-player-generator/player.php?player=jwplayer&url=https://dai.fancode.com/primary/126533_english_hls_95862adfreeta-di_h264/index.m3u8" allowfullscreen></iframe>
     </div>
   </div>
 
+  <!-- Footer -->
+  <div class="footer">
+    <p>© 2023 TNPL Live Streaming | Not affiliated with TNPL or Fancode | <a href="https://t.me/IPTVM3Y" target="_blank">Join Telegram</a></p>
+  </div>
+
   <script>
+    // Enhanced joinChannel function
     function joinChannel() {
-      window.location.href = 'https://t.me/IPTVM3Y';
+      // Add animation before redirecting
+      const popup = document.getElementById('welcomePopup');
+      popup.style.animation = 'fadeIn 0.5s ease-out reverse';
+      setTimeout(() => {
+        window.open('https://t.me/IPTVM3Y', '_blank');
+        popup.style.display = 'none';
+      }, 500);
     }
+
+    // Enhanced closePopup function
     function closePopup() {
-      document.getElementById('welcomePopup').style.display = 'none';
+      const popup = document.getElementById('welcomePopup');
+      popup.style.animation = 'fadeIn 0.5s ease-out reverse';
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 500);
     }
+
+    // Show popup on load with delay for better UX
     window.onload = () => {
-      document.getElementById('welcomePopup').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('welcomePopup').style.display = 'flex';
+      }, 500);
+      
+      // Check if user has visited before
+      if (localStorage.getItem('visitedBefore')) {
+        closePopup();
+      } else {
+        localStorage.setItem('visitedBefore', 'true');
+      }
     };
+
+    // Add hover effect to cards programmatically
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-8px)';
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
   </script>
 </body>
 </html>
