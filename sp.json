@@ -1,0 +1,18 @@
+{
+  "streamUrl": "https://rk-m3u.vercel.app/sonysports3hd.m3u8",
+  "backupUrls": [
+    "https://backup-server1.com/sonysports3hd.m3u8",
+    "https://backup-server2.com/sonysports3hd.m3u8"
+  ],
+  "metadata": {
+    "channelName": "Sony Sports 3 HD",
+    "logo": "https://example.com/logos/sonysports3.png",
+    "category": "Sports",
+    "isLive": true,
+    "drmProtected": false
+  },
+  "telegramInfo": {
+    "channel": "https://t.me/IPTVM3Y",
+    "popupMessage": "Join our Telegram for more streams!"
+  }
+}

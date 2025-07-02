@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sony Sports 3 HD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            overflow: hidden;
+        }
+        #video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 10;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: #0088cc;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #tg-popup {
+            position: fixed;
+            bottom: -200px;
+            right: 20px;
+            width: 90%;
+            max-width: 350px;
+            background: linear-gradient(135deg, #0088cc 0%, #005f8b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 100;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #tg-popup.show {
+            bottom: 20px;
+        }
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .popup-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .popup-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .popup-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-join {
+            background: #fff;
+            color: #0088cc;
+        }
+        .btn-later {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        @media (max-width: 500px) {
+            #tg-popup {
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Loading Sony Sports 3 HD...</p>
+    </div>
+
+    <div id="video-container">
+        <video id="video" controls autoplay playsinline></video>
+    </div>
+
+    <div id="tg-popup">
+        <div class="popup-header">
+            <div class="popup-title">Join Our Telegram Channel</div>
+            <button class="close-btn" onclick="hidePopup()">×</button>
+        </div>
+        <p>For more premium sports streams and updates</p>
+        <div class="popup-buttons">
+            <button class="popup-btn btn-later" onclick="hidePopup()">Later</button>
+            <button class="popup-btn btn-join" onclick="joinTelegram()">Join Now</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const config = {
+            jsonUrl: 'sp.json',
+            popupDelay: 30000, // 30 seconds
+            popupCookieName: 'tg_popup_closed',
+            cookieExpiryDays: 1
+        };
+
+        // DOM Elements
+        const video = document.getElementById('video');
+        const loading = document.getElementById('loading');
+        const popup = document.getElementById('tg-popup');
+
+        // Initialize player
+        document.addEventListener('DOMContentLoaded', initPlayer);
+
+        async function initPlayer() {
+            try {
+                // Fetch stream data from JSON
+                const response = await fetch(config.jsonUrl);
+                const data = await response.json();
+                
+                if (!data.streamUrl) throw new Error('No stream URL found');
+                
+                // Set video source
+                video.src = data.streamUrl;
+                
+                // When video starts playing
+                video.addEventListener('playing', () => {
+                    loading.style.display = 'none';
+                    showPopupAfterDelay();
+                });
+                
+                // Error handling
+                video.addEventListener('error', () => {
+                    loading.innerHTML = 'Error loading stream. Please try again later.';
+                    console.error('Error loading video');
+                });
+                
+            } catch (error) {
+                loading.innerHTML = 'Failed to load player. Please refresh.';
+                console.error('Initialization error:', error);
+            }
+        }
+
+        // Telegram popup functions
+        function showPopupAfterDelay() {
+            // Check if popup was previously closed
+            if (getCookie(config.popupCookieName)) return;
+            
+            setTimeout(() => {
+                popup.classList.add('show');
+            }, config.popupDelay);
+        }
+
+        function hidePopup() {
+            popup.classList.remove('show');
+            // Set cookie to remember for 1 day
+            setCookie(config.popupCookieName, 'true', config.cookieExpiryDays);
+        }
+
+        function joinTelegram() {
+            window.open('https://t.me/IPTVM3Y', '_blank');
+            hidePopup();
+        }
+
+        // Cookie functions
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    </script>
+</body>
+</html>
